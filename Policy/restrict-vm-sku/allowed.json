@@ -1,0 +1,15 @@
+{
+    "listOfAllowedSKUs": {
+        "value": [
+            "Standard_DS1_v2",
+            "Standard_DS2_v2",
+            "Standard_A1_v2"
+        ]
+    },
+    "listOfAllowedLocations": {
+        "value":[
+            "usgovvirginia",
+            "usgovtexas"
+        ]
+    }
+}

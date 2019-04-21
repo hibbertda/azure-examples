@@ -1,0 +1,18 @@
+{
+    "listOfAllowedSKUs": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Allowed SKUs",
+          "description": "Allowed SKUs for Azure virtual Machines.",
+          "strongType": "vmSKUs"
+        }
+      },
+      "listOfAllowedLocations": {
+        "type": "Array",
+        "metadata" :{
+            "displayName": "Allowed Locations",
+            "description": "List of allowed Azure regions",
+            "strongType": "location"
+        }
+    }
+}
