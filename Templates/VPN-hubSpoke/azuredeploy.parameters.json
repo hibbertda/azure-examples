@@ -1,0 +1,66 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vpnType": {
+            "value": "RouteBased",
+            "metadata": {
+                "description":"Azure VPN Type"
+            }
+        },
+        "localGatewayName": {
+            "value": "onPremGateway"
+        },
+        "localGatewayIpAddress": {
+            "value": "1.1.1.1",
+            "metadata": {
+                "description":"Public IP for On-Prem VPN gateway"
+            }            
+        },
+        "localAddressPrefix": {
+            "value": [ "192.168.0.0/16", "172.16.0.0/12" ],
+            "metadata": {
+                "description":"On-prem network(s)"
+            }              
+        },
+        "virtualNetworkName": {
+            "value": "coreHub"
+        },
+        "azureVNetAddressPrefix": {
+              "value": "10.3.0.0/16"
+        },
+        "subnetName": {
+            "value": "Subnet1"
+        },
+        "subnetPrefix": {
+             "value": "10.3.1.0/24"
+        },
+        "SQLMIsubnetName": {
+            "value": "SQLMI"
+        },        
+        "SQLMIsubnetPrefix": {
+            "value": "10.3.2.0/24",
+            "metadata": {
+                "description":"Subnet for Azure SQL Managed Instace"
+            }              
+       },        
+        "gatewaySubnetPrefix": {
+             "value": "10.3.200.0/29"
+        },
+        "gatewayPublicIPName": {
+            "value": "VPNGatewayIP"
+        },
+        "gatewayName": {
+            "value": "vpnGateway"
+        },
+        "connectionName": {
+            "value": "onPremConnection"
+        },
+        "sharedKey": {
+            "value": "",
+            "metadata": {
+                "description":"Pre-Shared key"
+            }            
+        }
+    }
+}
