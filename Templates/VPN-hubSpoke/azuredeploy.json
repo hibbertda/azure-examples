@@ -1,11 +1,11 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
-    "contentVersion": "1.0.0.0",
+    "contentVersion": "1.0.0.1",
     "parameters": {
       "vpnType": {
         "type": "string",
         "metadata": {
-          "description": "Route based or policy based"
+          "description": "Route based or policy based, RouteBased == IKEv2"
         },
         "defaultValue": "RouteBased",
         "allowedValues": [
@@ -17,7 +17,7 @@
         "type": "string",
         "defaultValue": "localGateway",
         "metadata": {
-          "description": "Arbitrary name for gateway resource representing "
+          "description": "Name for gateway resource representing "
         }
       },
       "localGatewayIpAddress": {
@@ -29,8 +29,8 @@
       "localAddressPrefix": {
         "type": "array",
         "defaultValue": [
-          "192.168.0.0/16",
-          "172.16.0.0/12"
+          "192.168.5.0/24",
+          "192.168.2.0/24"
         ],
         "metadata": {
           "description": "CIDR block representing the address space of the OnPremise VPN network's Subnet"
@@ -38,7 +38,7 @@
       },
       "virtualNetworkName": {
         "type": "string",
-        "defaultValue": "azureVnet",
+        "defaultValue": "core-VNet",
         "metadata": {
           "description": "Arbitrary name for the Azure Virtual Network"
         }
@@ -52,7 +52,7 @@
       },
       "subnetName": {
         "type": "string",
-        "defaultValue": "Subnet1",
+        "defaultValue": "Management",
         "metadata": {
           "description": "Arbitrary name for the Azure Subnet"
         }
@@ -61,7 +61,7 @@
         "type": "string",
         "defaultValue": "10.3.1.0/24",
         "metadata": {
-          "description": "CIDR block for VM subnet, subset of azureVNetAddressPrefix address space"
+          "description": "CIDR block for Management subnet"
         }
       },
       "SQLMIsubnetName": {
@@ -75,26 +75,26 @@
         "type": "string",
         "defaultValue": "10.3.2.0/24",
         "metadata": {
-          "description": "CIDR block for SQL MI subnet, subset of azureVNetAddressPrefix address space"
+          "description": "CIDR block for SQL MI subnet"
         }
       },
       "gatewaySubnetPrefix": {
         "type": "string",
-        "defaultValue": "10.3.200.0/29",
+        "defaultValue": "10.3.250.0/29",
         "metadata": {
           "description": "CIDR block for gateway subnet, subset of azureVNetAddressPrefix address space"
         }
       },
       "gatewayPublicIPName": {
         "type": "string",
-        "defaultValue": "azureGatewayIP",
+        "defaultValue": "s2sGWPiP",
         "metadata": {
           "description": "Arbitrary name for public IP resource used for the new azure gateway"
         }
       },
       "gatewayName": {
         "type": "string",
-        "defaultValue": "azureGateway",
+        "defaultValue": "s2sGW",
         "metadata": {
           "description": "Arbitrary name for the new gateway"
         }
@@ -113,7 +113,7 @@
       },
       "connectionName": {
         "type": "string",
-        "defaultValue": "Azure2Other",
+        "defaultValue": "s2sToOnPrem",
         "metadata": {
           "description": "Arbitrary name for the new connection between Azure VNet and other network"
         }
@@ -123,12 +123,43 @@
         "metadata": {
           "description": "Shared key (PSK) for IPSec tunnel"
         }
+      },
+      "coreNSGName": {
+        "type": "string",
+        "defaultValue": "core-VNET-NSG",
+        "metadata": {
+          "description": "Name for the defaul core-VNet NSG"
+        }
       }
     },
     "variables": {
       "gatewaySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'),'GatewaySubnet')]"
     },
     "resources": [
+      {
+        "apiVersion": "2018-08-01",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[parameters('coreNSGName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "rdpAllow",
+              "properties": {
+                "description": "Allow RDP from OnPrem",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "3389",
+                "sourceAddressPrefix": "192.168.2.0/24",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Inbound"
+              }
+            }
+          ]
+        }
+      },      
       {
         "apiVersion": "2015-06-15",
         "type": "Microsoft.Network/localNetworkGateways",
@@ -167,6 +198,9 @@
         "type": "Microsoft.Network/virtualNetworks",
         "name": "[parameters('virtualNetworkName')]",
         "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkSecurityGroups/', parameters('coreNSGName'))]"
+        ],        
         "properties": {
           "addressSpace": {
             "addressPrefixes": [
@@ -177,7 +211,10 @@
             {
               "name": "[parameters('subnetName')]",
               "properties": {
-                "addressPrefix": "[parameters('subnetPrefix')]"
+                "addressPrefix": "[parameters('subnetPrefix')]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('coreNSGName'))]"
+                }
               }
             },
             {
