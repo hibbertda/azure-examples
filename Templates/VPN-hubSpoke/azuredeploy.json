@@ -64,20 +64,34 @@
           "description": "CIDR block for Management subnet"
         }
       },
-      "SQLMIsubnetName": {
+      "adSubnetName": {
         "type": "string",
         "defaultValue": "SQLMI",
         "metadata": {
           "description": "Azure SQL MI Subnet"
         }
       },
-      "SQLMIsubnetPrefix": {
+      "adSubnetNetwork": {
         "type": "string",
         "defaultValue": "10.3.2.0/24",
         "metadata": {
           "description": "CIDR block for SQL MI subnet"
         }
       },
+      "sharedServicesSubnetName": {
+        "type": "string",
+        "defaultValue": "SharedServices",
+        "metadata": {
+          "description": "Shared Services subnet name"
+        }
+      },
+      "sharedServicesNetwork": {
+        "type": "string",
+        "defaultValue": "10.3.3.0/24",
+        "metadata": {
+          "description": "CIDR block for shared services subnet"
+        }
+      },      
       "gatewaySubnetPrefix": {
         "type": "string",
         "defaultValue": "10.3.250.0/29",
@@ -218,18 +232,30 @@
               }
             },
             {
-                "name": "[parameters('SQLMIsubnetName')]",
+                "name": "[parameters('adSubnetName')]",
                 "properties": {
-                  "addressPrefix": "[parameters('SQLMIsubnetPrefix')]"
+                  "addressPrefix": "[parameters('adSubnetNetwork')]"
                 },
                 "metadata":{
-                    "description": "SQL Managed instance subnet"
+                    "description": "Directory Services Subnet"
                 }
-              },            
+              },
+            {
+                "name": "[parameters('sharedServicesSubnetName')]",
+                "properties": {
+                  "addressPrefix": "[parameters('sharedServicesNetwork')]"
+                },
+                "metadata":{
+                    "description": "Shared Services Subnet"
+                }
+              },                                
             {
               "name": "GatewaySubnet",
               "properties": {
                 "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
+              },
+              "metadata": {
+                  "description": "Site-to-Site VPN Gateway Subnet"
               }
             }
           ]
