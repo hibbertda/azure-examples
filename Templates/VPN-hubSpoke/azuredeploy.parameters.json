@@ -30,13 +30,13 @@
               "value": "10.3.0.0/16"
         },
         "subnetName": {
-            "value": "Subnet1"
+            "value": "CoreServices"
         },
         "subnetPrefix": {
              "value": "10.3.1.0/24"
         },
         "adSubnetName": {
-            "value": "SQLMI"
+            "value": "DirectoryServices"
         },        
         "adSubnetNetwork": {
             "value": "10.3.2.0/24",
@@ -45,7 +45,7 @@
             }              
        },    
        "sharedServicesSubnetName": {
-        "value": "DirectoryServices"
+        "value": "SharedServices"
         },        
         "sharedServicesNetwork": {
             "value": "10.3.3.0/24",
