@@ -28,84 +28,10 @@
       },
       "localAddressPrefix": {
         "type": "array",
-        "defaultValue": [
-          "192.168.5.0/24",
-          "192.168.2.0/24"
-        ],
         "metadata": {
           "description": "CIDR block representing the address space of the OnPremise VPN network's Subnet"
         }
-      },
-      "virtualNetworkName": {
-        "type": "string",
-        "defaultValue": "core-VNet",
-        "metadata": {
-          "description": "Arbitrary name for the Azure Virtual Network"
-        }
-      },
-      "azureVNetAddressPrefix": {
-        "type": "string",
-        "defaultValue": "10.3.0.0/16",
-        "metadata": {
-          "description": "CIDR block representing the address space of the Azure VNet"
-        }
-      },
-      "subnetName": {
-        "type": "string",
-        "defaultValue": "Management",
-        "metadata": {
-          "description": "Arbitrary name for the Azure Subnet"
-        }
-      },
-      "subnetPrefix": {
-        "type": "string",
-        "defaultValue": "10.3.1.0/24",
-        "metadata": {
-          "description": "CIDR block for Management subnet"
-        }
-      },
-      "adSubnetName": {
-        "type": "string",
-        "defaultValue": "SQLMI",
-        "metadata": {
-          "description": "Azure SQL MI Subnet"
-        }
-      },
-      "adSubnetNetwork": {
-        "type": "string",
-        "defaultValue": "10.3.2.0/24",
-        "metadata": {
-          "description": "CIDR block for SQL MI subnet"
-        }
-      },
-      "sharedServicesSubnetName": {
-        "type": "string",
-        "defaultValue": "SharedServices",
-        "metadata": {
-          "description": "Shared Services subnet name"
-        }
-      },
-      "sharedServicesNetwork": {
-        "type": "string",
-        "defaultValue": "10.3.3.0/24",
-        "metadata": {
-          "description": "CIDR block for shared services subnet"
-        }
-      },      
-      "gatewaySubnetPrefix": {
-        "type": "string",
-        "defaultValue": "10.3.250.0/29",
-        "metadata": {
-          "description": "CIDR block for gateway subnet, subset of azureVNetAddressPrefix address space"
-        }
-      },
-      "gatewayPublicIPName": {
-        "type": "string",
-        "defaultValue": "s2sGWPiP",
-        "metadata": {
-          "description": "Arbitrary name for public IP resource used for the new azure gateway"
-        }
-      },
+      },  
       "gatewayName": {
         "type": "string",
         "defaultValue": "s2sGW",
@@ -138,22 +64,60 @@
           "description": "Shared key (PSK) for IPSec tunnel"
         }
       },
-      "coreNSGName": {
+      "virtualNetworkName": {
         "type": "string",
-        "defaultValue": "core-VNET-NSG",
+        "defaultValue": "core-transit",
         "metadata": {
-          "description": "Name for the defaul core-VNet NSG"
+          "description": "Arbitrary name for the Azure Virtual Network"
         }
-      }
-    },
+      },
+      "azureVNetAddressPrefix": {
+        "type": "string",
+        "defaultValue": "10.3.0.0/16",
+        "metadata": {
+          "description": "CIDR block representing the address space of the Azure VNet"
+        }
+      },      
+      "subnetNameList": {
+        "type": "array",
+        "metadata": {
+          "description": "List of subnet names"
+        },        
+        "defaultValue": [
+          "CoreServices",
+          "SharedServices",
+          "DirectoryServices"
+        ]
+      },
+      "subnetPrefixList": {
+        "type": "array",
+        "metadata": {
+          "description": "List of subnet Prefixes"
+        },        
+        "defaultValue": [
+          "10.3.1.0/24",
+          "10.3.2.0/24",
+          "10.3.3.0/24"
+        ]
+      },
+      "gatewaySubnetPrefix": {
+        "type": "string",
+        "defaultValue": "10.3.250.0/29",
+        "metadata": {
+          "description": "CIDR block for gateway subnet, subset of azureVNetAddressPrefix address space"
+        }
+      }            
+    },    
     "variables": {
-      "gatewaySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'),'GatewaySubnet')]"
+      "gatewaySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'),'GatewaySubnet')]",
+      "coreNetNSGName": "[concat(parameters('virtualNetworkName'), '-NSG')]",
+      "vpnGatewayPIPName": "[concat(parameters('gatewayName'), '-PIP')]"
     },
     "resources": [
       {
         "apiVersion": "2018-08-01",
         "type": "Microsoft.Network/networkSecurityGroups",
-        "name": "[parameters('coreNSGName')]",
+        "name": "[variables('coreNetNSGName')]",
         "location": "[resourceGroup().location]",
         "properties": {
           "securityRules": [
@@ -213,7 +177,7 @@
         "name": "[parameters('virtualNetworkName')]",
         "location": "[resourceGroup().location]",
         "dependsOn": [
-          "[concat('Microsoft.Network/networkSecurityGroups/', parameters('coreNSGName'))]"
+          "[concat('Microsoft.Network/networkSecurityGroups/', variables('coreNetNSGName'))]"
         ],        
         "properties": {
           "addressSpace": {
@@ -223,48 +187,31 @@
           },
           "subnets": [
             {
-              "name": "[parameters('subnetName')]",
+              "name": "[concat(parameters('subnetNameList')[copyIndex()])]",
+              "copy": {
+                "name": "coreSubnets",
+                "count": "[length(parameters('subnetNameList'))]"
+              },
               "properties": {
-                "addressPrefix": "[parameters('subnetPrefix')]",
+                "addressPrefix": "[parameters('subnetPrefixList')[copyIndex()]]",
                 "networkSecurityGroup": {
-                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('coreNSGName'))]"
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('coreNetNSGName'))]"
                 }
               }
             },
             {
-                "name": "[parameters('adSubnetName')]",
-                "properties": {
-                  "addressPrefix": "[parameters('adSubnetNetwork')]"
-                },
-                "metadata":{
-                    "description": "Directory Services Subnet"
-                }
-              },
-            {
-                "name": "[parameters('sharedServicesSubnetName')]",
-                "properties": {
-                  "addressPrefix": "[parameters('sharedServicesNetwork')]"
-                },
-                "metadata":{
-                    "description": "Shared Services Subnet"
-                }
-              },                                
-            {
               "name": "GatewaySubnet",
               "properties": {
                 "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
-              },
-              "metadata": {
-                  "description": "Site-to-Site VPN Gateway Subnet"
               }
-            }
+            }            
           ]
         }
       },
       {
         "apiVersion": "2015-06-15",
         "type": "Microsoft.Network/publicIPAddresses",
-        "name": "[parameters('gatewayPublicIPName')]",
+        "name": "[variables('vpnGatewayPIPName')]",
         "location": "[resourceGroup().location]",
         "properties": {
           "publicIPAllocationMethod": "Dynamic"
@@ -276,7 +223,7 @@
         "name": "[parameters('gatewayName')]",
         "location": "[resourceGroup().location]",
         "dependsOn": [
-          "[concat('Microsoft.Network/publicIPAddresses/', parameters('gatewayPublicIPName'))]",
+          "[concat('Microsoft.Network/publicIPAddresses/', variables('vpnGatewayPIPName'))]",
           "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
         ],
         "properties": {
@@ -288,7 +235,7 @@
                   "id": "[variables('gatewaySubnetRef')]"
                 },
                 "publicIPAddress": {
-                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('gatewayPublicIPName'))]"
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('vpnGatewayPIPName'))]"
                 }
               },
               "name": "vnetGatewayConfig"

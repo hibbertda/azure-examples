@@ -24,40 +24,10 @@
             }              
         },
         "virtualNetworkName": {
-            "value": "coreHub"
-        },
-        "azureVNetAddressPrefix": {
-              "value": "10.3.0.0/16"
-        },
-        "subnetName": {
-            "value": "CoreServices"
-        },
-        "subnetPrefix": {
-             "value": "10.3.1.0/24"
-        },
-        "adSubnetName": {
-            "value": "DirectoryServices"
-        },        
-        "adSubnetNetwork": {
-            "value": "10.3.2.0/24",
-            "metadata": {
-                "description":"Subnet for "
-            }              
-       },    
-       "sharedServicesSubnetName": {
-        "value": "SharedServices"
-        },        
-        "sharedServicesNetwork": {
-            "value": "10.3.3.0/24",
-            "metadata": {
-                "description":"Subnet for "
-            }              
-        },              
+            "value": "wings-core-vnet"
+        },      
         "gatewaySubnetPrefix": {
              "value": "10.3.200.0/29"
-        },
-        "gatewayPublicIPName": {
-            "value": "VPNGatewayIP"
         },
         "gatewayName": {
             "value": "vpnGateway"
