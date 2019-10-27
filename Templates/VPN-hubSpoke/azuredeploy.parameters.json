@@ -2,11 +2,49 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vpnType": {
-            "value": "RouteBased",
+        "vpnConfig": {
             "metadata": {
-                "description":"Azure VPN Type"
-            }
+                "description": "configuration information for S2S VPN"
+            },
+            "value": [
+                {
+                    "vpnType": "RouteBased",
+                    "gatewayName": "WingsS2SGW",
+                    "gatewaySku": "Basic"
+                }
+            ]
+        },
+        "azureVNetAddressPrefix": {
+            "metadata": {
+                "description": "VNet IP address Prefix"
+            },
+            "value": "10.4.0.0/16"
+        },
+        "subnetsList": {
+            "metadata": {
+                "description": "List of subnets to create in primary VNet."
+            },
+            "value": [
+                {
+                    "name": "CoreServices",
+                    "addressPrefix": "10.4.1.0/24",
+                    "nsg": "true"
+                },
+                {
+                    "name": "SharedServices",
+                    "addressPrefix": "10.4.2.0/24",
+                    "nsg": "true"
+                },
+                {
+                    "name": "DirectoryServices",
+                    "addressPrefix": "10.4.3.0/24",
+                    "nsg": "true"
+                }, 
+                {
+                    "name": "GatewaySubent",
+                    "addressPrefix": "10.4.250.0/28"
+                }                             
+            ]
         },
         "localGatewayName": {
             "value": "onPremGateway"
@@ -26,12 +64,6 @@
         "virtualNetworkName": {
             "value": "wings-core-vnet"
         },      
-        "gatewaySubnetPrefix": {
-             "value": "10.3.200.0/29"
-        },
-        "gatewayName": {
-            "value": "vpnGateway"
-        },
         "connectionName": {
             "value": "onPremConnection"
         },
