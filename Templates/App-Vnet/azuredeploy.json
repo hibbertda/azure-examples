@@ -1,0 +1,129 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.1",
+    "parameters": {
+      "appVNetName": {
+        "type": "string",
+        "defaultValue": "App-Vnet",
+        "metadata": {
+          "description": "Arbitrary name for the Azure Virtual Network"
+        }
+      },
+      "appVNetAddressPrefix": {
+        "type": "string",
+        "defaultValue": "10.5.0.0/16",
+        "metadata": {
+          "description": "CIDR block representing the address space of the Azure VNet"
+        }
+      },      
+      "subnetsList": {
+        "type": "array",
+        "metadata": {
+          "description": "List of subnet names"
+        },        
+        "defaultValue": [
+          {
+            "name": "app1Frontend",
+            "addressPrefix": "10.5.1.0/24"
+          },
+          {
+            "name": "app1BackEnd",
+            "addressPrefix": "10.5.2.0/24"
+          },          
+          {
+            "name": "app2",
+            "addressPrefix": "10.5.3.0/24"
+          }        
+        ]
+      },
+      "coreResourceGroup": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the core Resource Group where the core/transit VNet is located"
+        },
+        "defaultValue": "hbl-wings-network"
+      },
+      "coreVNet": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the Core/Transit VNet"
+        },
+        "defaultValue": "wings-core-vnet"
+      }
+    },    
+    "variables": {
+    },
+    "resources": [
+      {
+        "apiVersion": "2019-04-01",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[concat(parameters('subnetsList')[copyIndex('subnetNSGCopy')].name, '-NSG')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "rdpAllow",
+              "properties": {
+                "description": "Allow RDP from OnPrem",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "3389",
+                "sourceAddressPrefix": "192.168.2.0/24",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Inbound"
+              }
+            }
+          ]
+        },
+        "copy": {
+          "name": "subnetNSGCopy",
+          "count": "[length(parameters('subnetsList'))]"
+        }
+      },      
+      {
+        "apiVersion": "2019-04-01",
+        "type": "Microsoft.Network/virtualNetworks",
+        "name": "[parameters('appVNetName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": ["subnetNSGCopy"],
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "[parameters('appVNetAddressPrefix')]"
+            ]
+          },
+          "copy": [
+            {
+              "name": "subnets",
+              "count": "[length(parameters('subnetsList'))]",
+              "input": {
+                "name": "[parameters('subnetsList')[copyIndex('subnets')].name]",
+                "properties": {
+                  "addressPrefix": "[parameters('subnetsList')[copyIndex('subnets')].addressPrefix]",
+                  "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('subnetsList')[copyIndex('subnets')].name, '-NSG'))]"
+                  }
+                }
+              }
+            }
+          ],
+          "virtualNetworkPeerings": [
+            {
+              "name": "coreAppVNetPeer",
+              "properties": {
+                "allowVirtualNetworkAccess": "true",
+                "allowForwardedTraffic": "true",
+                "allowGatewayTransit": "false",
+                "useRemoteGateways": "true",
+                "remoteVirtualNetwork": {
+                  "id": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('coreVNet'))]"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
