@@ -39,11 +39,15 @@
                     "name": "DirectoryServices",
                     "addressPrefix": "10.4.3.0/24",
                     "nsg": "true"
-                }, 
+                }                            
+            ]
+        },
+        "gatewaySubnet": {
+            "value": [
                 {
-                    "name": "GatewaySubent",
+                    "name": "GatewaySubnet",
                     "addressPrefix": "10.4.250.0/28"
-                }                             
+                }
             ]
         },
         "localGatewayName": {

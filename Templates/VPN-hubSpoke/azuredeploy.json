@@ -81,11 +81,16 @@
             "name": "DirectoryServices",
             "addressPrefix": "10.3.3.0/24",
             "nsg": "true"
-          },
+          }        
+        ]
+      },
+      "gatewaySubnet": {
+        "type": "array",
+        "defaultValue": [
           {
             "name": "GatewaySubnet",
-            "addressPrefix": "10.3.250.0/29"
-          }          
+            "addressPrefix": "10.3.250.0/28"
+          }
         ]
       }
     },    
@@ -142,7 +147,7 @@
         ],
         "properties": {
           "virtualNetworkGateway1": {
-            "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('vpnConfig').gatewayName)]"
+            "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('vpnConfig')[0].gatewayName)]"
           },
           "localNetworkGateway2": {
             "id": "[resourceId('Microsoft.Network/localNetworkGateways', parameters('localGatewayName'))]"
@@ -181,6 +186,18 @@
         }
       },
       {
+        "apiVersion": "2019-04-01",
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "name": "[concat(parameters('virtualNetworkName'), '/', parameters('gatewaySubnet')[0].name)]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "addressPrefix": "[parameters('gatewaySubnet')[0].addressPrefix]"
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+        ]        
+      },
+      {
         "apiVersion": "2015-06-15",
         "type": "Microsoft.Network/publicIPAddresses",
         "name": "[variables('vpnGatewayPIPName')]",
@@ -190,7 +207,7 @@
         }
       },
       {
-        "apiVersion": "2015-06-15",
+        "apiVersion": "2019-04-01",
         "type": "Microsoft.Network/virtualNetworkGateways",
         "name": "[parameters('vpnConfig')[0].gatewayName]",
         "location": "[resourceGroup().location]",
