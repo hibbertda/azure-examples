@@ -1,0 +1,103 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "coreResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource Group Core/Transit"
+            },
+            "defaultValue": "hbl-wings-network"
+        },
+        "vmConfig":  {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "name": "man-ubnt",
+                    "adminUsername": "",
+                    "adminPassword": "",
+                    "virtualMachineSize": "Standard_D2s_v3",
+                    "osDiskType": "Standard_LRS",
+                    "diagnosticsStorageAccountName": "",
+                    "diagnosticsStorageAccountId": ""
+                }
+            ]
+        },
+        "vmNetworking": {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "subnetName": "CoreServices",
+                    "virtualNetworkName": "coreVNet"
+                }
+            ]
+        }
+    },
+    "variables": {
+        "vnetId": "[resourceId('Microsoft.Network/virtualNetworks/', parameters('vmNetworking')[0].virtualNetworkName)]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('vmNetworking')[0].subnetName)]",
+        "vmNIC0Name": "[concat(parameters('vmConfig')[0].name, '-NIC0')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('vmNIC0Name')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('vmConfig')[0].name]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('vmNIC0Name'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmConfig')[0].virtualMachineSize]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('vmConfig')[0].osDiskType]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "18.04-LTS",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmNIC0Name'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmConfig')[0].name]",
+                    "adminUsername": "[parameters('vmConfig')[0].adminUsername]",
+                    "adminPassword": "[parameters('vmConfig')[0].adminPassword]"
+                }
+            }
+        }
+    ]
+}
