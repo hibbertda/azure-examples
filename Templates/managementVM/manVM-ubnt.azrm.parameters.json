@@ -5,16 +5,13 @@
         "coreResourceGroup": {
             "value": ""
         },
-        "networkInterfaceName": {
-            "value": ""
-        },
         "subnetName": {
             "value": ""
         },
         "coreVNet": {
             "value": ""
         },
-        "virtualMachineName": {
+        "vmName": {
             "value": ""
         },
         "osDiskType": {
