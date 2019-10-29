@@ -9,37 +9,36 @@
             },
             "defaultValue": "hbl-wings-network"
         },
-        "vmConfig":  {
-            "type": "array",
-            "defaultValue": [
-                {
-                    "name": "man-ubnt",
-                    "adminUsername": "",
-                    "adminPassword": "",
-                    "virtualMachineSize": "Standard_D2s_v3",
-                    "osDiskType": "Standard_LRS",
-                    "diagnosticsStorageAccountName": "",
-                    "diagnosticsStorageAccountId": ""
-                }
+        "vmName": {
+            "type": "string"
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2s_v3",
+            "allowedValues": [
+                "Standard_D3s_v3"
             ]
+        },
+        "osDiskType": {
+            "type": "string"
+        },        
+        "adminUsername": {
+            "type": "string"
         },
         "adminPassword": {
             "type": "string"
         },
-        "vmNetworking": {
-            "type": "array",
-            "defaultValue": [
-                {
-                    "subnetName": "CoreServices",
-                    "virtualNetworkName": "hbl-wings-network"
-                }
-            ]
-        }
+        "subnetName": {
+            "type": "string"
+        },
+        "coreVNet": {
+            "type": "string"
+        }       
     },
     "variables": {
-        "vnetId": "[resourceId('Microsoft.Network/virtualNetworks/', parameters('vmNetworking')[0].virtualNetworkName)]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('vmNetworking')[0].subnetName)]",
-        "vmNIC0Name": "[concat(parameters('vmConfig')[0].name, '-NIC0')]"
+        "vnetId": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('coreVNet'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "vmNIC0Name": "[concat(parameters('vmName'), '-NIC0')]"
     },
     "resources": [
         {
@@ -63,7 +62,7 @@
             }
         },
         {
-            "name": "[parameters('vmConfig')[0].name]",
+            "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
             "location": "[resourceGroup().location]",
@@ -72,13 +71,13 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('vmConfig')[0].virtualMachineSize]"
+                    "vmSize": "[parameters('virtualMachineSize')]"
                 },
                 "storageProfile": {
                     "osDisk": {
                         "createOption": "fromImage",
                         "managedDisk": {
-                            "storageAccountType": "[parameters('vmConfig')[0].osDiskType]"
+                            "storageAccountType": "[parameters('osDiskType')]"
                         }
                     },
                     "imageReference": {
@@ -96,8 +95,8 @@
                     ]
                 },
                 "osProfile": {
-                    "computerName": "[parameters('vmConfig')[0].name]",
-                    "adminUsername": "[parameters('vmConfig')[0].adminUsername]",
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 }
             }
