@@ -236,7 +236,7 @@
           },
           "gatewayType": "Vpn",
           "vpnType": "[parameters('vpnConfig')[0].vpnType]",
-          "enableBgp": "false"
+          "enableBgp": false
         }
       }
     ]

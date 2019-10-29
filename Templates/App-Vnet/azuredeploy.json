@@ -113,10 +113,10 @@
             {
               "name": "coreAppVNetPeer",
               "properties": {
-                "allowVirtualNetworkAccess": "true",
-                "allowForwardedTraffic": "true",
-                "allowGatewayTransit": "false",
-                "useRemoteGateways": "true",
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": true,
                 "remoteVirtualNetwork": {
                   "id": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('coreVNet'))]"
                 }

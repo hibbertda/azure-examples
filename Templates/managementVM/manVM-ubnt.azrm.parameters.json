@@ -6,13 +6,13 @@
             "value": ""
         },
         "subnetName": {
-            "value": ""
+            "value": "CoreServices"
         },
         "coreVNet": {
-            "value": ""
+            "value": "wings-core-vnet"
         },
         "vmName": {
-            "value": ""
+            "value": "coreMGMTVm"
         },
         "osDiskType": {
             "value": "Standard_LRS"
@@ -21,7 +21,7 @@
             "value": "Standard_D2s_v3"
         },
         "adminUsername": {
-            "value": ""
+            "value": "mgmtadm"
         },
         "adminPassword": {
             "value": null
