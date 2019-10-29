@@ -14,10 +14,7 @@
         },
         "virtualMachineSize": {
             "type": "string",
-            "defaultValue": "Standard_D2s_v3",
-            "allowedValues": [
-                "Standard_D3s_v3"
-            ]
+            "defaultValue": "Standard_D2s_v3"
         },
         "osDiskType": {
             "type": "string"
