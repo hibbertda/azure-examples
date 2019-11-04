@@ -1,0 +1,112 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "coreVnetName": {
+           "type": "string",
+           "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "defaultCoreVNET"
+        },
+        "coreVnetPrefix": {
+           "type": "string",
+           "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "10.10.0.0/16"
+        },
+        "coreVnetSubnets": {
+           "type": "array",
+           "metadata": {
+                "description": "Array of Subnet names and prefixes"
+            },
+            "defaultValue": [
+                {
+                    "name": "CoreServices",
+                    "addressPrefix": "10.10.1.0/24"
+                },
+                {
+                    "name": "SharedServices",
+                    "addressPrefix": "10.10.2.0/24"
+                }
+            ]
+        },
+        "utcCreationTime": {
+           "type": "string",
+           "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "[utcNow()]"
+        }
+    },
+    "variables": {},
+    "resources": [     
+        {
+            "name": "[concat('NSG-', parameters('coreVnetSubnets')[copyIndex('NSGCopy')].name)]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "creationTime": "[parameters('utcCreationTime')]"
+            },
+            "copy": {
+                "name": "NSGCopy",
+                "count": "[length(parameters('coreVnetSubnets'))]"
+            },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow_RDP",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": "100",
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('coreVnetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": ["NSGCopy"],
+            "tags": {
+                "displayName": "[parameters('coreVnetName')]",
+                "creationTime": "[parameters('utcCreationTime')]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('coreVnetPrefix')]"
+                    ]
+                },
+                "copy": [
+                    {
+                        "name": "subnets",
+                        "count": "[length(parameters('coreVnetSubnets'))]",
+                        "input": {
+                            "name": "[parameters('coreVnetSubnets')[copyIndex('subnets')].name]",
+                            "properties": {
+                                "addressPrefix": "[parameters('coreVnetSubnets')[copyIndex('subnets')].addressPrefix]",
+                                "networkSecurityGroup": {
+                                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat('NSG-', parameters('coreVnetSubnets')[copyIndex('subnets')].name))]"
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
