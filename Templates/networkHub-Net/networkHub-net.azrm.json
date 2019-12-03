@@ -5,14 +5,14 @@
         "coreVnetName": {
            "type": "string",
            "metadata": {
-                "description": "description"
+                "description": "Name for core-vnet"
             },
             "defaultValue": "defaultCoreVNET"
         },
         "coreVnetPrefix": {
            "type": "string",
            "metadata": {
-                "description": "description"
+                "description": "core-vnet IP address prefix (ex 10.0.0.0/24)"
             },
             "defaultValue": "10.10.0.0/16"
         },
