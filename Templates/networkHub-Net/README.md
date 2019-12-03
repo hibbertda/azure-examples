@@ -1,4 +1,4 @@
-# Core (Transit) VNet Template
+# networkHub-Net (Transit VNet) Template
 
 This template will deploy a basic networking configuration to act as a core or transit Virtual Network (VNet), with basic subnets and Network Security Groups (NSG).
 
