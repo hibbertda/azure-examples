@@ -4,9 +4,11 @@ This template will deploy a basic networking configuration to act as a core or t
 
 Resources deployed:
 - Virtual Network (VNet)
-- Network Security Group
+- Network Security Group (one per Subnet)
 
-This template does not include a VPN. To add a VPN use the S2SVPN template to add a VPN configuration to an existing VNet. 
+![Azure Resources deployed as part of this template](../../img/templates/networkHub-Net-resources.png)
+
+This template does not include a VPN. To add a VPN use the S2SVPN template to add a VPN configuration to an existing VNet. [S2SVPN Template](../networkHub-s2sVPN) 
 
 ---
 
@@ -18,3 +20,5 @@ This template does not include a VPN. To add a VPN use the S2SVPN template to ad
 <a href="https://portal.azure.us/#create/Microsoft.Template/uri/https%3a%2f%2fraw.githubusercontent.com%2fhibbertda%2fazure-examples%2fvpnbreakout%2fTemplates%2fnetworkHub-Net%2fnetworkHub-net.azrm.json" target="_blank">
     <img src="https://azuredeploy.net/AzureGov.png"/>
 </a>
+
+
