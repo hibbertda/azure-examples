@@ -10,7 +10,7 @@ This template will deploy an Azure Site-to-Site VPN configuration to an existing
 - Gateway subnet (Created in existing transit VNet)
 
 
-This template is a companion to the networkHub-Net core/transit VNet template. [networkHub-Net Template](../networkHub-Net) 
+This template is a companion to the networkHub-Net core/transit VNet template. [networkHub-Net Template](../001-networkHub-Net) 
 
 does not include a VPN. To add a VPN use the S2SVPN template to add a VPN configuration to an existing VNet. 
 
