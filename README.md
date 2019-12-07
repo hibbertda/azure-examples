@@ -1,23 +1,26 @@
-
-
 ## Automation
-|||
+||Description|
 | --- | --- |
 | [AAD_GuestReport] | Use Azure Automation to generate a report of 'Guest' users in Azure Active Directory (AAD).
 
 ## Azure Policy
-|||
+||Description|
 | --- | --- | 
 | [Restrict-VM-Sku] | User Azure Policy to restrict virtual machine SKUs allowed. 
 
-## ARM Templates
-|||
+# ARM Templates
+
+## Core Infrastructure 
+||Description|
 | --- | --- |
 | [networkHub-Net] | Core / Transit VNet
 | [networkHub-s2sVPN] | Add Azure Site-to-Site VPN to existing transit VNet
 | [AppVnet] | Example VNet for hosting several applications
 | [DeployKeyVault] | Deploy an Azure KeyVault with default configuration
 | [DeployVNETHubSpoke] | Deploy Basic VNet with Site-to-Site VPN
+
+## Azure Governance
+
 
 
 [AAD_GuestReport]:/Automation/aad-guest-report
