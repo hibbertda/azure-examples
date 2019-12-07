@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vpnType": {
+            "value": "RouteBased"
+        },
+        "vpnGatewayName": {
+            "value": "wings2-vpn-gateway"
+        },
+        "vpnGatewaySku": {
+            "value": "Basic"
+        },
+        "localGatewayname": {
+            "value": "TheHibbsHouse"
+        },
+        "localGatewayIpAddress": {
+            "value": "10.2.4.1"
+        },
+        "localAddressPrefix": {
+            "value": ["192.168.2.0/24", "192.168.5.0/24"]
+        },
+        "connectionName": {
+            "value": "TheHibbsHouseConnection"
+        },
+        "vpnSharedkey": {
+            "value": null
+        },
+        "coreVNetName": {
+            "value": "defaultCoreVNET"
+        },
+        "coreVPNGatewaySubnetName": {
+            "value": "GatewaySubnet"
+        }
+    }
+}

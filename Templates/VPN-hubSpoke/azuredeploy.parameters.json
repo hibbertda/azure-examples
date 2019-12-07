@@ -2,11 +2,53 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vpnType": {
-            "value": "RouteBased",
+        "vpnConfig": {
             "metadata": {
-                "description":"Azure VPN Type"
-            }
+                "description": "configuration information for S2S VPN"
+            },
+            "value": [
+                {
+                    "vpnType": "RouteBased",
+                    "gatewayName": "WingsS2SGW",
+                    "gatewaySku": "Basic"
+                }
+            ]
+        },
+        "azureVNetAddressPrefix": {
+            "metadata": {
+                "description": "VNet IP address Prefix"
+            },
+            "value": "10.4.0.0/16"
+        },
+        "subnetsList": {
+            "metadata": {
+                "description": "List of subnets to create in primary VNet."
+            },
+            "value": [
+                {
+                    "name": "CoreServices",
+                    "addressPrefix": "10.4.1.0/24",
+                    "nsg": "true"
+                },
+                {
+                    "name": "SharedServices",
+                    "addressPrefix": "10.4.2.0/24",
+                    "nsg": "true"
+                },
+                {
+                    "name": "DirectoryServices",
+                    "addressPrefix": "10.4.3.0/24",
+                    "nsg": "true"
+                }                            
+            ]
+        },
+        "gatewaySubnet": {
+            "value": [
+                {
+                    "name": "GatewaySubnet",
+                    "addressPrefix": "10.4.250.0/28"
+                }
+            ]
         },
         "localGatewayName": {
             "value": "onPremGateway"
@@ -24,35 +66,8 @@
             }              
         },
         "virtualNetworkName": {
-            "value": "coreHub"
-        },
-        "azureVNetAddressPrefix": {
-              "value": "10.3.0.0/16"
-        },
-        "subnetName": {
-            "value": "Subnet1"
-        },
-        "subnetPrefix": {
-             "value": "10.3.1.0/24"
-        },
-        "SQLMIsubnetName": {
-            "value": "SQLMI"
-        },        
-        "SQLMIsubnetPrefix": {
-            "value": "10.3.2.0/24",
-            "metadata": {
-                "description":"Subnet for Azure SQL Managed Instace"
-            }              
-       },        
-        "gatewaySubnetPrefix": {
-             "value": "10.3.200.0/29"
-        },
-        "gatewayPublicIPName": {
-            "value": "VPNGatewayIP"
-        },
-        "gatewayName": {
-            "value": "vpnGateway"
-        },
+            "value": "wings-core-vnet"
+        },      
         "connectionName": {
             "value": "onPremConnection"
         },

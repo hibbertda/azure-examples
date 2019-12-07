@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "coreResourceGroup": {
+            "value": ""
+        },
+        "subnetName": {
+            "value": "CoreServices"
+        },
+        "coreVNet": {
+            "value": "wings-core-vnet"
+        },
+        "vmName": {
+            "value": "coreMGMTVm"
+        },
+        "osDiskType": {
+            "value": "Standard_LRS"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_D2"
+        },
+        "adminUsername": {
+            "value": "mgmtadm"
+        },
+        "adminPassword": {
+            "value": null
+        }
+    }
+}
