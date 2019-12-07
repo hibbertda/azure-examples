@@ -1,3 +1,7 @@
+# Azure Examples
+
+
+
 ## Automation
 ||Description|
 | --- | --- |
@@ -11,13 +15,13 @@
 # ARM Templates
 
 ## Core Infrastructure 
-||Description|
-| --- | --- |
-| [networkHub-Net] | Core / Transit VNet
-| [networkHub-s2sVPN] | Add Azure Site-to-Site VPN to existing transit VNet
-| [AppVnet] | Example VNet for hosting several applications
-| [DeployKeyVault] | Deploy an Azure KeyVault with default configuration
-| [DeployVNETHubSpoke] | Deploy Basic VNet with Site-to-Site VPN
+|Name|Description|Type|
+| --- | --- | --- |
+| [networkHub-Net] | Core / Transit VNet | ARM
+| [networkHub-s2sVPN] | Add Azure Site-to-Site VPN to existing transit VNet | ARM
+| [AppVnet] | Example VNet for hosting several applications | ARM
+| [DeployKeyVault] | Deploy an Azure KeyVault with default configuration | ARM
+| [DeployVNETHubSpoke] | Deploy Basic VNet with Site-to-Site VPN | ARM
 
 ## Azure Governance
 
