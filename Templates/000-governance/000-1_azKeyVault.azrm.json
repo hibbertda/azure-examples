@@ -1,0 +1,182 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "keyVaultName": {
+           "type": "string",
+           "metadata": {
+                "description": "Display name for KeyVault"
+            },
+            "defaultValue": "kv-core-management"
+        },
+        "aadTenantID": {
+           "type": "string",
+           "metadata": {
+                "description": "Azure Active Directory tenant ID that should be used for authenticating requests (GUID)"
+            },
+            "defaultValue": "[subscription().tenantid]"
+        },
+        "kvGroupObjectID": {
+           "type": "string",
+           "metadata": {
+                "description": "AAD Group ObjectID to assign administrative permissions of the KevVault"
+            }
+        },
+        "enabledForDeployment": {
+           "type": "bool",
+           "metadata": {
+                "description": "Are VMs permitted to retrieve certs stored as secrets"
+            },
+            "defaultValue": true,
+            "allowedValues": [
+                true,
+                false
+            ]
+        },
+        "enabledForDiskEncryption": {
+           "type": "bool",
+           "metadata": {
+                "description": "Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys"
+            },
+            "defaultValue": false,
+            "allowedValues": [
+                true,
+                false
+            ]
+        },
+        "enabledForTemplateDeployment": {
+           "type": "bool",
+           "metadata": {
+                "description": "Azure Resource Manager is permitted to retrieve secrets"
+            },
+            "defaultValue": true,
+            "allowedValues": [
+                true,
+                false
+            ]
+        },
+        "kvSKU": {
+           "type": "string",
+           "metadata": {
+                "description": "specify whether the key vault is a standard vault or a premium vault."
+            },
+            "defaultValue": "standard",
+            "allowedValues":[
+                "standard",
+                "premium"
+            ]
+        },
+        "kvLogStorageAccountName": {
+           "type": "string",
+           "metadata": {
+                "description": "Storage Account for storing KeyVault logs"
+            },
+            "defaultValue": "kvlogging"
+        },
+        "kvLogRetention": {
+           "type": "string",
+           "metadata": {
+                "description": "Days to retain KeyVault logs"
+            },
+            "defaultValue": "90"
+        },
+        "tagTechnicalPOC": {
+           "type": "string",
+           "metadata": {
+                "description": "Contact information for Technical POC"
+            },
+            "defaultValue": "admin@admin.com"
+        },
+        "deploymentUTC": {
+           "type": "string",
+           "metadata": {
+                "description": "Time of resource deployment in UTC"
+            },
+            "defaultValue":"[utcNow()]"
+        }
+    },
+    "variables": {
+        "kvloggingStorageAccount": "[concat('hblsa', parameters('kvLogStorageAccountName'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('kvloggingStorageAccount')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[variables('kvloggingStorageAccount')]"
+            },
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2018-02-14",
+            "name": "[parameters('keyVaultName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[parameters('keyVaultName')]",
+                "CreationTime": "[parameters('deploymentUTC')]",
+                "TechnicalPOC": "[parameters('tagTechnicalPOC')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageaccounts/', variables('kvloggingStorageAccount'))]"
+            ],
+            "properties": {
+                "enabledForDeployment": "[parameters('enabledForDeployment')]",
+                "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
+                "enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
+                "tenantId": "[parameters('aadTenantID')]",
+                "accessPolicies": [
+                    {
+                        "tenantId": "[parameters('aadTenantID')]",
+                        "objectId": "[parameters('kvGroupObjectID')]",
+                        "permissions": {
+                            "keys": [
+                                "Get" 
+                             ],
+                            "secrets": [
+                                "List",
+                                "Get",
+                                "Set"
+                            ]
+                       }
+                    }
+                ],
+                "sku": {
+                    "name": "[parameters('kvSKU')]",
+                    "family": "A"
+                }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.KeyVault/vaults/providers/diagnosticsettings",
+                    "name": "[concat(parameters('keyVaultName'), '/Microsoft.Insights/service')]",
+                    "apiVersion": "2016-09-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Keyvault/vaults/', parameters('keyVaultName'))]",
+                        "[concat('Microsoft.Storage/storageaccounts/', variables('kvloggingStorageAccount'))]"
+                    ],
+                    "properties": {
+                        "storageAccountId": "[resourceId('Microsoft.storage/storageaccounts', variables('kvloggingStorageAccount'))]",
+                        "logs": [
+                            {
+                                "category": "AuditEvent",
+                                "enabled": true,
+                                "retentionPolicy": {
+                                    "enabled": true,
+                                    "days": "[parameters('kvLogRetention')]"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
