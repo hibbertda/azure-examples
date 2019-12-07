@@ -20,7 +20,6 @@
 | [networkHub-Net] | Core / Transit VNet | ARM
 | [networkHub-s2sVPN] | Add Azure Site-to-Site VPN to existing transit VNet | ARM
 | [AppVnet] | Example VNet for hosting several applications | ARM
-| [DeployKeyVault] | Deploy an Azure KeyVault with default configuration | ARM
 | [DeployVNETHubSpoke] | Deploy Basic VNet with Site-to-Site VPN | ARM
 
 ## Azure Governance
@@ -34,5 +33,4 @@
 [networkHub-Net]:/Templates/001-networkHub-Net
 [networkHub-s2sVPN]:/Templates/002-networkHub-s2sVPN
 [AppVnet]:/Templates/003-App-Vnet
-[DeployKeyVault]:/Templates/KeyVault
 [DeployVNETHubSpoke]:/Templates/VPN-hubSpoke
