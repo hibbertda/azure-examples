@@ -23,8 +23,9 @@
 | [DeployVNETHubSpoke] | Deploy Basic VNet with Site-to-Site VPN | ARM
 
 ## Azure Governance
-
-
+|Name|Description|Type|
+| --- | --- | --- |
+|[azKeyVault]|Azure KeyVault (no secrets)|ARM
 
 [AAD_GuestReport]:/Automation/aad-guest-report
 
@@ -34,3 +35,5 @@
 [networkHub-s2sVPN]:/Templates/002-networkHub-s2sVPN
 [AppVnet]:/Templates/003-App-Vnet
 [DeployVNETHubSpoke]:/Templates/VPN-hubSpoke
+
+[azKeyVault]:/Templates/000-governance
