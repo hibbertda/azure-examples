@@ -71,36 +71,20 @@
                 "description": "Azure Core/Trasit VNet name"
             }
         },
-        "coreVPNGatewaySubnetName": {
+        "coreRGName": {
            "type": "string",
            "metadata": {
-                "description": "VPN Gateway subnet in Core/Transit VNet"
-            },
-            "defaultValue": "gatewaySubnet"
-        },
-        "coreVPNGatewayPrefix": {
-           "type": "string",
-           "metadata": {
-                "description": "address prefix for VPN Gateway subnet"
-            },
-            "defaultValue": "10.10.250.0/28"
+                "description": "Core networking resource groupo"
+            }
         }
     },
     "variables": {
+        "vnetId": "[resourceId(parameters('coreRGName'), 'Microsoft.Network/virtualNetworks/', parameters('coreVNetName'))]",
         "vpnGatewayPublicIPName": "[concat(parameters('vpnGatewayName'), '-PublicIP')]",
-        "gatewaySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('coreVNetName'), parameters('coreVPNGatewaySubnetName'))]",
+        "gatewaySubnetRef": "[concat(variables('vnetId'), '/subnets/GatewaySubnet')]",        
         "vpnPublicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vpnGatewayPublicIPName'))]"
     },
-    "resources": [
-        {
-            "apiVersion": "2019-04-01",
-            "type": "Microsoft.Network/virtualNetworks/subnets",
-            "name": "[concat(parameters('coreVnetName'), '/', 'gatewaySubnet')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-            "addressPrefix": "[parameters('coreVPNGatewayPrefix')]"
-            }     
-        },           
+    "resources": [         
         {
             "name": "[variables('vpnGatewayPublicIPName')]",
             "type": "Microsoft.Network/publicIPAddresses",
@@ -109,6 +93,7 @@
             "tags": {
                 "displayName": "[variables('vpnGatewayPublicIPName')]"
             },
+            "dependsOn": [],
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
             }
@@ -175,7 +160,7 @@
                 },
                 "gatewayType": "Vpn",
                 "vpnType": "[parameters('vpnType')]",
-                "enableBgp": "false"
+                "enableBgp": false
             }
         }
     ]
