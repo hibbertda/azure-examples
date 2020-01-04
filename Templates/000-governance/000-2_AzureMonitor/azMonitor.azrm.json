@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "laWorkspaceName": {
+           "type": "string",
+           "metadata": {
+                "description": "Log Analytics Workspace Name"
+            }
+        },
+        "laWorkspaceRetentionDays": {
+           "type": "int",
+           "metadata": {
+                "description": "Log Analytics Workspace log retention in days"
+            },
+            "defaultValue": 15
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('laWorkspaceName')]",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2015-11-01-preview",
+            "location": "[resourceGroup().location]",
+            "comments": "Log Analytics Workspace",
+            "properties": {
+                "sku": {
+                    "name": "Free"
+                },
+                "features": {
+                    "searchVersion": 1
+                }
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}

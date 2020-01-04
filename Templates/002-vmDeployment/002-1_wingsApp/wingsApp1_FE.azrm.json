@@ -1,0 +1,205 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "networkResourceGroup": {
+           "type": "string",
+           "metadata": {
+                "description": "Resource Group where networking resources are located"
+            },
+            "defaultValue": "core-network"
+        },
+        "vNetName": {
+           "type": "string",
+           "metadata": {
+                "description": "Virtual Network name"
+            }
+        },
+        "vNetSubnetName": {
+           "type": "string",
+           "metadata": {
+                "description": "Subnet for VMs"
+            }
+        },
+        "appName": {
+           "type": "string",
+           "metadata": {
+                "description": "Application Name. Will be used to create VM hostnames"
+            },
+            "defaultValue": "App1"
+        },
+        "vmSKU": {
+           "type": "string",
+           "metadata": {
+                "description": "Virtual Machine SKU"
+            },
+            "allowedValues": [
+                "Standard_D4_v3",
+                "Standard_D2_v3"
+            ],
+            "defaultValue": "Standard_D2_v3"
+        },
+        "osDiskType": {
+           "type": "string",
+           "metadata": {
+                "description": "VM OS Disk type"
+            },
+            "defaultValue": "Standard_LRS"
+        },
+        "osImagePublisher": {
+           "type": "string",
+           "metadata": {
+                "description": "OS Image Publisher"
+            },
+            "defaultValue": "MicrosoftWindowsServer"
+        },
+        "osImageOffer": {
+           "type": "string",
+           "metadata": {
+                "description": "OS Image Offer"
+            },
+            "defaultValue": "WindowsServer"
+        },
+        "osImageSKU": {
+           "type": "string",
+           "metadata": {
+                "description": "OS Image Sku"
+            },
+            "defaultValue": "2016-Datacenter"
+        },
+        "vmAdminUsername": {
+           "type": "string",
+           "metadata": {
+                "description": "VM OS Default Admin Username"
+            },
+            "defaultValue": "azVMOSAdmin"
+        },
+        "vmAdminPassword": {
+           "type": "securestring",
+           "metadata": {
+                "description": "VM OS Admin Password"
+            }
+        },
+        "tagTechnicalPOC": {
+           "type": "string",
+           "metadata": {
+                "description": "Contact information for Technical POC"
+            },
+            "defaultValue": "admin@admin.com"
+        },
+        "instanceCount": {
+           "type": "int",
+           "defaultValue": 2,
+           "metadata": {
+                "description": "The number of VMs to deploy in the template"
+            }
+        }        
+    },
+    "variables": {
+        "vnetId": "[resourceId(parameters('networkResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('vNetName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('vNetSubnetName'))]",
+        "vmName": "[concat('vm-', parameters('appName'))]",
+        "avSetName": "[concat('avs-', parameters('appName'))]"        
+    },
+    "resources": [
+        {
+            "name": "[variables('avSetName')]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2018-10-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[variables('avSetName')]"
+            },
+            "properties": {
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 2
+
+            }
+        },
+        {
+            "name": "[concat(variables('vmName'), '-', copyIndex(), '-NIC0')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('instanceCount')]"
+            },
+            "dependsOn": [],
+            "tags": {
+                "displayName": "[concat(parameters('appName'), '-NIC0')]",
+                "technicalPOC": "[parameters('tagTechnicalPOC')]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(variables('vmName'), '-', copyIndex())]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2017-03-30",
+            "location": "[resourceGroup().location]",
+            "copy": {
+                "name": "vmLoop",
+                "count": "[parameters('instanceCount')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName'), '-', copyIndex(), '-NIC0'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName'))]"
+            ],
+            "tags": {
+                "displayName": "windowsVM1",
+                "technicalPOC": "[parameters('tagTechnicalPOC')]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSKU')]"
+                },
+                "osProfile": {
+                    "computerName": "windowsVM1",
+                    "adminUsername": "[parameters('vmAdminUsername')]",
+                    "adminPassword": "[parameters('vmAdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('osImagePublisher')]",
+                        "offer": "[parameters('osImageOffer')]",
+                        "sku": "[parameters('osImageSKU')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[concat(variables('vmName'), '-', copyIndex(), '-disk0')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "managedDisk":{
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName'), '-', copyIndex(), '-NIC0'))]"
+                        }
+                    ]
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName'))]"
+                }
+            }
+            
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}

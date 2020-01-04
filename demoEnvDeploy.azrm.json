@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionID": {
+           "type": "string",
+           "metadata": {
+                "description": "Azure Subscription ID"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name":"DeployLabEnv-All",
+            "type":"Microsoft.Resources/deployments",
+            "apiVersion":"2019-05-01",
+            "subscriptionId":"[subscription().ID]",
+            "resourceGroup":"",
+            "location":"[resourceGroup().location]",
+            "properties":{
+                "templateLink":{
+                    "uri":"./001-Networking/001-1_networkhub-Net/networkHub-net.azrm.json"
+                },
+                "parametersLink":{
+                    "uri":"./001-Networking/001-1_networkhub-Net/sensitive.inl.networkHub-net.azrm.parameters.json"
+                },
+                "mode":"Incremental"
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
