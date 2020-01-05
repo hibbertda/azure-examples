@@ -9,9 +9,21 @@
             "value": ""
         },
         "subnetsList": {
-            "value": ""
+            "value": [
+                {
+                    "name": "",
+                    "addressPrefix": ""
+                },
+                {
+                    "name": "",
+                    "addressPrefix": ""
+                }
+            ]
         },
         "coreResourceGroup": {
+            "value": ""
+        },
+        "coreVNet": {
             "value": ""
         }
     }
