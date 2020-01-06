@@ -25,8 +25,7 @@
            "type": "string",
            "metadata": {
                 "description": "Application Name. Will be used to create VM hostnames"
-            },
-            "defaultValue": "App1"
+            }
         },
         "vmSKU": {
            "type": "string",
@@ -84,8 +83,7 @@
            "type": "string",
            "metadata": {
                 "description": "Contact information for Technical POC"
-            },
-            "defaultValue": "admin@admin.com"
+            }
         },
         "instanceCount": {
            "type": "int",
@@ -98,36 +96,58 @@
     "variables": {
         "vnetId": "[resourceId(parameters('networkResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('vNetName'))]",
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('vNetSubnetName'))]",
-        "vmName": "[concat('vm-', parameters('appName'))]",
-        "avSetName": "[concat('avs-', parameters('appName'))]"        
+        "vmName_be": "[concat('vm-be', parameters('appName'))]",
+        "vmName_rdp": "[concat('vm-rdp', parameters('appName'))]",        
+        "avSetName_be": "[concat('avs-be', parameters('appName'))]",
+        "avSetName_rdp": "[concat('avs-rdp', parameters('appName'))]"        
     },
     "resources": [
         {
-            "name": "[variables('avSetName')]",
+            "name": "[variables('avSetName_be')]",
             "type": "Microsoft.Compute/availabilitySets",
             "apiVersion": "2018-10-01",
             "location": "[resourceGroup().location]",
             "tags": {
-                "displayName": "[variables('avSetName')]"
+                "displayName": "[variables('avSetName_be')]"
             },
             "properties": {
                 "platformFaultDomainCount": 2,
                 "platformUpdateDomainCount": 2
 
+            },
+            "sku": {
+                "name": "Aligned"
             }
         },
         {
-            "name": "[concat(variables('vmName'), '-', copyIndex(), '-NIC0')]",
+            "name": "[variables('avSetName_rdp')]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2018-10-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[variables('avSetName_rdp')]"
+            },
+            "properties": {
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 2
+
+            },
+            "sku": {
+                "name": "Aligned"
+            }
+        },        
+        {
+            "name": "[concat(variables('vmName_be'), '-', copyIndex(), '-NIC0')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-08-01",
             "location": "[resourceGroup().location]",
             "copy": {
-                "name": "nicLoop",
+                "name": "nicLoop_be",
                 "count": "[parameters('instanceCount')]"
             },
             "dependsOn": [],
             "tags": {
-                "displayName": "[concat(parameters('appName'), '-NIC0')]",
+                "displayName": "[concat(variables('vmName_be'), '-', copyIndex(), '-NIC0')]",
                 "technicalPOC": "[parameters('tagTechnicalPOC')]"
             },
             "properties": {
@@ -145,17 +165,45 @@
             }
         },
         {
-            "name": "[concat(variables('vmName'), '-', copyIndex())]",
+            "name": "[concat(variables('vmName_rdp'), '-', copyIndex(), '-NIC0')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "copy": {
+                "name": "nicLoop_rdp",
+                "count": "[parameters('instanceCount')]"
+            },
+            "dependsOn": [],
+            "tags": {
+                "displayName": "[concat(variables('vmName_rdp'), '-', copyIndex(), '-NIC0')]",
+                "technicalPOC": "[parameters('tagTechnicalPOC')]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },        
+        {
+            "name": "[concat(variables('vmName_be'), '-', copyIndex())]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2017-03-30",
             "location": "[resourceGroup().location]",
             "copy": {
-                "name": "vmLoop",
+                "name": "vmLoop_be",
                 "count": "[parameters('instanceCount')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName'), '-', copyIndex(), '-NIC0'))]",
-                "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName'))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName_be'), '-', copyIndex(), '-NIC0'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName_be'))]"
             ],
             "tags": {
                 "displayName": "windowsVM1",
@@ -178,7 +226,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "[concat(variables('vmName'), '-', copyIndex(), '-disk0')]",
+                        "name": "[concat(variables('vmName_be'), '-', copyIndex(), '-disk0')]",
                         "caching": "ReadWrite",
                         "createOption": "FromImage",
                         "managedDisk":{
@@ -189,16 +237,69 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName'), '-', copyIndex(), '-NIC0'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName_be'), '-', copyIndex(), '-NIC0'))]"
                         }
                     ]
                 },
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName'))]"
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName_be'))]"
                 }
             }
-            
-        }
+        },
+        {
+            "name": "[concat(variables('vmName_rdp'), '-', copyIndex())]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2017-03-30",
+            "location": "[resourceGroup().location]",
+            "copy": {
+                "name": "vmLoop_rdp",
+                "count": "[parameters('instanceCount')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName_rdp'), '-', copyIndex(), '-NIC0'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName_rdp'))]"
+            ],
+            "tags": {
+                "displayName": "windowsVM1",
+                "technicalPOC": "[parameters('tagTechnicalPOC')]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSKU')]"
+                },
+                "osProfile": {
+                    "computerName": "windowsVM1",
+                    "adminUsername": "[parameters('vmAdminUsername')]",
+                    "adminPassword": "[parameters('vmAdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('osImagePublisher')]",
+                        "offer": "[parameters('osImageOffer')]",
+                        "sku": "[parameters('osImageSKU')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[concat(variables('vmName_rdp'), '-', copyIndex(), '-disk0')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "managedDisk":{
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('vmName_rdp'), '-', copyIndex(), '-NIC0'))]"
+                        }
+                    ]
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName_rdp'))]"
+                }
+            }
+        }        
     ],
     "outputs": {},
     "functions": []
