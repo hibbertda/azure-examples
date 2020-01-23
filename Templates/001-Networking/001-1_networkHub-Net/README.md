@@ -36,12 +36,12 @@ The parameters for the template uses an array to define the name and IPv4 addres
 ---
 
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3a%2f%2fraw.githubusercontent.com%2fhibbertda%2fazure-examples%2fvpnbreakout%2fTemplates%2fnetworkHub-Net%2fnetworkHub-net.azrm.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/hibbertda/azure-examples/wings2/Templates/001-Networking/001-1_networkHub-Net/networkHub-net.azrm.json" target="_blank">
     <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.png"/>
 </a>
 
 
-<a href="https://portal.azure.us/#create/Microsoft.Template/uri/https%3a%2f%2fraw.githubusercontent.com%2fhibbertda%2fazure-examples%2fvpnbreakout%2fTemplates%2fnetworkHub-Net%2fnetworkHub-net.azrm.json" target="_blank">
+<a href="https://portal.azure.us/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/hibbertda/azure-examples/wings2/Templates/001-Networking/001-1_networkHub-Net/networkHub-net.azrm.json" target="_blank">
     <img src="https://azuredeploy.net/AzureGov.png"/>
 </a>
 
