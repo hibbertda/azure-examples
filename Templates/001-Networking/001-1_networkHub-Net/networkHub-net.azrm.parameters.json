@@ -28,6 +28,9 @@
             "metadata": {
                 "description": "Array of Subnet names and prefixes"
             }
+        },
+        "gatewaySubnetPrefix": {
+            "value": "10.10."
         }
     }
 }

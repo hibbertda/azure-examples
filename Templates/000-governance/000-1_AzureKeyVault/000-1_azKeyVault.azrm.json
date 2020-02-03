@@ -96,7 +96,7 @@
         }
     },
     "variables": {
-        "kvloggingStorageAccount": "[concat('hblsa', parameters('kvLogStorageAccountName'))]"
+        "kvloggingStorageAccount": "[concat('hblstdiag', parameters('kvLogStorageAccountName'))]"
     },
     "resources": [
         {

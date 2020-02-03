@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "coreVNetName": {
+          "type": "string",
+          "metadata": {
+            "description": "Name of the Core/Transit VNet"
+          }
+      },
+      "appVNetName": {
+          "type": "string",
+          "metadata": {
+            "description": "Name of the App VNet"
+          }
+      },
+      "coreResourceGroup": {
+          "type": "string",
+          "metadata": {
+            "description": "Name of the core Resource Group where the core/transit VNet is located"
+          }
+      }
+    },
+    "variables": {
+      "coreVNetID": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('coreVNetName'))]",
+      "appVNetID": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Network/virtualNetworks/', parameters('appVNetName'))]",
+      "corePeerName": "[concat(parameters('coreVNetName'),'/peering-to-',parameters('appVNetName'))]",
+      "appPeerName": "[concat(parameters('appVNetName'),'/peering-to-',parameters('coreVNetName'))]"
+    },
+    "resources": [
+      {
+        "name": "[variables('corePeerName')]",
+        "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+        "apiVersion": "2019-09-01",
+        "properties": {
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": true,
+          "allowGatewayTransit": true,
+          "useRemoteGateways": false,
+          "remoteVirtualNetwork": {
+              "id": "[variables('appVNetID')]"
+          }
+        }
+      },
+      {
+        "name": "[variables('appPeerName')]",
+        "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+        "apiVersion": "2019-09-01",
+        "properties": {
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": true,
+          "allowGatewayTransit": false,
+          "useRemoteGateways": true,
+          "remoteVirtualNetwork": {
+              "id": "[variables('coreVNetID')]"
+          }
+        }
+      }      
+    ],
+    "outputs": {},
+    "functions": []
+}

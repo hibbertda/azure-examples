@@ -32,6 +32,12 @@
                 }
             ]
         },
+        "gatewaySubnetPrefix": {
+           "type": "string",
+           "metadata": {
+                "description": "VPN GatewaySubnet IPv4 prefix (ex. 10.5.25.0/28)"
+            }
+        },
         "utcCreationTime": {
            "type": "string",
            "metadata": {
@@ -66,7 +72,7 @@
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
-                            "priority": "100",
+                            "priority": 100,
                             "direction": "Inbound"
                         }
                     }
@@ -105,7 +111,19 @@
                     }
                 ]
             }
-        }
+        },
+        {
+            "apiVersion": "2019-04-01",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "name": "[concat(parameters('coreVnetName'), '/', 'GatewaySubnet')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('coreVnetName'))]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
+            }     
+        }    
     ],
     "outputs": {},
     "functions": []

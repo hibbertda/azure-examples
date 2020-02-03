@@ -1,0 +1,89 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "policyAssignmentName": {
+           "type": "string",
+           "metadata": {
+                "description": "Name of the Azure Policy Assignment"
+            }
+        },
+        "policySKU": {
+           "type": "string",
+           "metadata": {
+                "description": "description"
+            },
+            "allowedValues": [
+                "A0",
+                "A1"
+            ],
+            "defaultValue": "A0"
+        },
+        "policyTier": {
+           "type": "string",
+           "metadata": {
+                "description": "description"
+            },
+            "allowedValues": [
+                "Free",
+                "Standard"
+            ],
+            "defaultValue": "Free"
+        },
+        "coreResourceGroup": {
+           "type": "string",
+           "metadata": {
+                "description": "Core/Transit Resource Group to add as an exclusion"
+            }
+        }
+    },
+    "variables": {
+        "PIPRestrictionAssignmentName": "[concat(parameters('policyAssignmentName'),'- assignment')]",
+        "PIPRestrictionDefinitionName": "[concat(parameters('policyAssignmentName'),'- definition')]",
+        "PIPPolicyDefinitionID": "[resourceId('Microsoft.Authorization/policyDefinitions',variables('PIPRestrictionDefinitionName'))]",
+        "RGPolicyScopeExclusion": "[concat(subscription().id,'/resourceGroups/',parameters('coreResourceGroup'))]"
+
+    },
+    "resources": [
+        {
+            "name": "[variables('PIPRestrictionDefinitionName')]",
+            "type": "Microsoft.Authorization/policyDefinitions",
+            "apiVersion": "2019-06-01",
+            "properties": {
+                "policyType": "Custom",
+                "mode": "All",
+                "displayName": "HBL - Restrict Public IP",
+                "description": "Restrict Public IP resources to approved Resource Groups",
+                "parameters": {},                
+                "policyRule": {
+                    "if": {
+                        "field": "type",
+                        "equals": "Microsoft.Network/publicIPAddresses"
+                    },
+                    "then": {
+                        "effect": "Deny"
+                    }
+                },
+                "metadata": {}
+            }
+        },        
+        {           
+            "type": "Microsoft.Authorization/policyAssignments",
+            "name": "[variables('PIPRestrictionAssignmentName')]",
+            "apiVersion": "2019-06-01",
+            "properties": {
+                "scope": "[subscription().id]",
+                "notScopes": [
+                    "[variables('RGPolicyScopeExclusion')]"
+                ],
+                "policyDefinitionId": "[variables('PIPPolicyDefinitionID')]"
+            },
+            "sku": {
+                "name": "[parameters('policySKU')]",
+                "tier": "[parameters('PolicyTier')]"
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}

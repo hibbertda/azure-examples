@@ -4,14 +4,12 @@
     "parameters": {
       "appVNetName": {
         "type": "string",
-        "defaultValue": "App-Vnet",
         "metadata": {
           "description": "Arbitrary name for the Azure Virtual Network"
         }
       },
       "appVNetAddressPrefix": {
         "type": "string",
-        "defaultValue": "10.5.0.0/16",
         "metadata": {
           "description": "CIDR block representing the address space of the Azure VNet"
         }
@@ -19,36 +17,20 @@
       "subnetsList": {
         "type": "array",
         "metadata": {
-          "description": "List of subnet names"
-        },        
-        "defaultValue": [
-          {
-            "name": "app1Frontend",
-            "addressPrefix": "10.5.1.0/24"
-          },
-          {
-            "name": "app1BackEnd",
-            "addressPrefix": "10.5.2.0/24"
-          },          
-          {
-            "name": "app2",
-            "addressPrefix": "10.5.3.0/24"
-          }        
-        ]
+          "description": "Array of subnet names and addressPrefixes"
+        }
       },
       "coreResourceGroup": {
         "type": "string",
         "metadata": {
           "description": "Name of the core Resource Group where the core/transit VNet is located"
-        },
-        "defaultValue": "hbl-wings-network"
+        }
       },
       "coreVNet": {
         "type": "string",
         "metadata": {
           "description": "Name of the Core/Transit VNet"
-        },
-        "defaultValue": "wings-core-vnet"
+        }
       }
     },    
     "variables": {
