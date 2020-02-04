@@ -2,6 +2,29 @@
 
 
 
+## Getting Stared ##
+
+The easiest way to get started using these examples is to used the [Azure Cloud Shell (ACS)](https://shell.azure.com). ACS has all of the tools required to run all of these templates already baked in, without needing to install anything locally to your workstation.
+
+### Clone Repo ###
+Clone this 'azure-examples' repository
+
+```bash
+git clone https://github.com/hibbertda/azure-examples
+```
+
+select the directory for the desired example or template. By default ACS will place the cloned repository in your home directory.
+
+```bash
+cd ~/azure-examples
+```
+### Template Parameters ###
+Each template has a [Parameters File](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-parameters) to specify configuration parameters for the resource deployment. 
+
+ACS includes an in [integrated file editor](https://docs.microsoft.com/en-us/azure/cloud-shell/using-cloud-shell-editor). 
+
+## Examples ##
+
 ## Automation
 ||Description|
 | --- | --- |
