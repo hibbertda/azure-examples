@@ -23,7 +23,7 @@ cd ./azure-examples
 
 Each template has a [Parameters File](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-parameters) to specify configuration parameters for the resource deployment. ACS includes an in [integrated file editor](https://docs.microsoft.com/en-us/azure/cloud-shell/using-cloud-shell-editor). Launch the editor by running **code .** at the cloud shell terminal to open the editor in the current active working directory.
 
-![launch code editor](../img/acs_code_directory.png)
+![launch code editor](/img/acs_code_directory.png)
 
 ## Examples
 
