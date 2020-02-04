@@ -6,7 +6,7 @@ The easiest way to get started using these examples is to used the [Azure Cloud 
 
 [![Launch Cloud Shell](https://shell.azure.com/images/launchcloudshell.png "Launch Cloud Shell")](https://shell.azure.com/powershell)
 
-*Note: If this is your first time using the Azure Cloud Shell there are some initial setup steps*
+##### Note: If this is your first time using the Azure Cloud Shell there are some initial setup steps
 
 ### Clone Repo
 
@@ -25,30 +25,42 @@ cd ./azure-examples
 
 ### Template Parameters
 
-Each template has a [Parameters File](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-parameters) to specify configuration parameters for the resource deployment. ACS includes an in [integrated file editor](https://docs.microsoft.com/en-us/azure/cloud-shell/using-cloud-shell-editor). Launch the editor by running **code .** at the cloud shell terminal to open the editor in the current active working directory.
+Each template has a [Parameters File](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-parameters) to specify configuration parameters for the resource deployment. Each template includes information on the required parameters and steps for deployment. 
+
+ACS includes an in [integrated file editor](https://docs.microsoft.com/en-us/azure/cloud-shell/using-cloud-shell-editor). Launch the editor by running **code .** at the cloud shell terminal to open the editor in the current active working directory.
 
 ![launch code editor](/img/acs_code_directory.png)
 
-## Examples
+![ACS code editor](/img/acs_code_directory_2.png)
 
-### Core Infrastructure
+Update and save (**Ctrl-S**) the template example files in the ACS code editor. Close the ACS code editor (**Ctrl-Q**) and move on to the template deployment. 
 
-|Name|Description|Type|
-| --- | --- | --- |
-| [networkHub-Net](/Templates/001-Networking/001-1_networkHub-Net) | Core / Transit VNet | ARM
-| [networkHub-s2sVPN](/Templates/001-Networking/001-2_networkHub-s2sVPN) | Add Azure Site-to-Site VPN to existing transit VNet | ARM
-| [AppVnet](/Templates/001-Networking/001-3_App-Vnet) | Example VNet for hosting several applications | ARM
+## Example Templates
 
-### Azure Governance
+### 000 Azure Governance
 
 |Name|Description|Type|
 | --- | --- | --- |
-| [DeployKeyVault](/Templates/KeyVault) | Deploy an Azure KeyVault with default configuration | ARM
-| [DeployVNETHubSpoke](/Templates/VPN-hubSpoke) | Deploy Basic VNet with Site-to-Site VPN | ARM
-| [Restrict-VM-Sku](/Policy/restrict-vm-sku) | User Azure Policy to restrict virtual machine SKUs allowed. | Az Policy
+| [000-1_DeployKeyVault](/Templates/000-governance/000-1_AzureKeyVault) | Deploy an Azure KeyVault with default configuration | ARM
+| [000-2_AzureMonitor](/Templates/000-governance/000-2_AzureMonitor) | Deploy Azure Log Analytics Workspace | ARM
+| [000-3_AzurePolicy](/Templates/000-governance/000-3_AzurePolicy) | Deploy Azure Policy(ies) | ARM
 
-### Azure Automation
+### 001 Networking
 
 |Name|Description|Type|
 | --- | --- | --- |
-| [AAD_GuestReport](/Automation/aad-guest-report) | Use Azure Automation to generate a report of 'Guest' users in Azure Active Directory (AAD). | Az Automation
+| [001-1_networkHub-Net](/Templates/001-Networking/001-1_networkHub-Net) | Core / Transit VNet | ARM
+| [001-2_networkHub-s2sVPN](/Templates/001-Networking/001-2_networkHub-s2sVPN) | Add Azure Site-to-Site VPN to existing transit VNet | ARM
+| [001-3_AppVnet](/Templates/001-Networking/001-3_App-Vnet) | Example VNet for hosting several applications | ARM
+
+### 002 App Deployment
+
+|Name|Description|Type|
+| --- | --- | --- |
+| [002-1_WingsApp](/Templates/002-AppDeployment/002-1_wingsApp) | IaaS VM deployment | ARM
+
+## Azure Automation
+
+|Name|Description|Type|
+| --- | --- | --- |
+| [AAD_GuestReport](/Automation/aad-guest-report) | Generate a report of 'Guest' users in Azure Active Directory (AAD). | Az Automation
