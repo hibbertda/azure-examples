@@ -4,6 +4,10 @@
 
 The easiest way to get started using these examples is to used the [Azure Cloud Shell (ACS)](https://shell.azure.com). ACS has all of the tools required to run all of these templates already baked in, without needing to install anything locally to your workstation.
 
+[![Launch Cloud Shell](https://shell.azure.com/images/launchcloudshell.png "Launch Cloud Shell")](https://shell.azure.com/powershell)
+
+*Note: If this is your first time using the Azure Cloud Shell there are some initial setup steps*
+
 ### Clone Repo
 
 Clone this 'azure-examples' repository
