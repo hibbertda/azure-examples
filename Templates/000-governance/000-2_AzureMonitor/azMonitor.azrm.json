@@ -5,15 +5,30 @@
         "laWorkspaceName": {
            "type": "string",
            "metadata": {
-                "description": "Log Analytics Workspace Name"
+                "description": "Workspace Name"
             }
         },
         "laWorkspaceRetentionDays": {
            "type": "int",
            "metadata": {
-                "description": "Log Analytics Workspace log retention in days"
+                "description": "Log retention in days"
             },
             "defaultValue": 15
+        },
+        "laWorkspaceSKU": {
+           "type": "string",
+           "metadata": {
+                "description": "The name of the Workspace SKU"
+            },
+            "allowedValues": [
+                "Free",
+                "Standard",
+                "Premium",
+                "PerNode",
+                "PerGB2018",
+                "Standalone"
+            ],
+            "defaultValue": "Free"
         }
     },
     "variables": {},
@@ -26,11 +41,12 @@
             "comments": "Log Analytics Workspace",
             "properties": {
                 "sku": {
-                    "name": "Free"
+                    "name": "[parameters('laWorkspaceSKU')]"
                 },
                 "features": {
                     "searchVersion": 1
-                }
+                },
+                "retentionInDays": "[parameters('laWorkspaceRetentionDays')]"
             }
         }
     ],
