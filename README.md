@@ -20,6 +20,8 @@ The Resource Groups are required to be created before the template deployment is
 
 #### Create Resource Groups
 
+Resource Group can be created from the Azure [Portal](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal#create-resource-groups), or either the Azure PowerShell or Azure CLI command line environments. 
+
 **Azure PowerShell**
 
 ```powershell
@@ -34,7 +36,7 @@ az group create --name <Resource Group Name> \
     --location <Azure Region Name>
 ```
 
-### Clone Repo
+### Clone Azure-Examples git Repository
 
 Clone this 'azure-examples' repository to your Azure Cloud Shell storage. 
 
