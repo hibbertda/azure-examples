@@ -5,9 +5,8 @@ This template will deploy an [Azure KeyVault (AKV)](https://docs.microsoft.com/e
 ## Resources deployed
 
 - [Azure KeyVault](https://docs.microsoft.com/en-us/azure/key-vault/key-vault-overview)
-- [Azure Storage Account](https://docs.microsoft.com/en-us/azure/key-vault/key-vault-logging) for storing audit logs
+- [Azure Storage Account](https://docs.microsoft.com/en-us/azure/key-vault/key-vault-logging) for audit log storage.
 
-This template will deploy an 
 
 ## Parameters
 
@@ -59,6 +58,19 @@ New-AzResourceGroupDeployment -name AzKVDeployment `
     -ResourceGroupName <ResourceGroupName> `
     -TemplateFile ./000-1_azKeyVault.azrm.json `
     -TemplateParameterFile ./000-1_azKeyVault.azrm.parameters.json
+```
+
+### Azure CLI (BASH)
+
+```bash
+# move to template directory
+cd ~/azure-examples/Templates/000-governance/000-1_AzureKeyVault
+
+az group deployment validate \
+    --resource-group <resource-group-name> \
+    --template-file ./000-1_azKeyVault.azrm.json \
+    --parameters ./000-1_azKeyVault.azrm.parameters.json
+
 ```
 
 ### Azure Portal
