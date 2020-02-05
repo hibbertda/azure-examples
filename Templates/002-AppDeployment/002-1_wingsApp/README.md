@@ -80,7 +80,7 @@ The default administrator password for the VM will be stored in an Azure KeyVaul
 cd ~/azure-examples/Templates/002-AppDeployment/002-1_wingsApp
 
 # Deploy AzKeyVault Template
-New-AzResourceGroupDeployment -name AzNetworkCoreDeployment `
+New-AzResourceGroupDeployment -name app1deployment `
     -ResourceGroupName <ResourceGroupName> `
     -TemplateFile ./App1_FE.azrm.json `
     -TemplateParameterFile ./App1_FE.azrm.parameters.json
