@@ -83,6 +83,7 @@ Update and save (**Ctrl-S**) the template example files in the ACS code editor. 
 
 ### 002 App Deployment
 
+
 |Name|Description|Type|
 | --- | --- | --- |
 | [002-1_WingsApp](/Templates/002-AppDeployment/002-1_wingsApp) | IaaS VM deployment | ARM
@@ -92,3 +93,4 @@ Update and save (**Ctrl-S**) the template example files in the ACS code editor. 
 |Name|Description|Type|
 | --- | --- | --- |
 | [AAD_GuestReport](/Automation/aad-guest-report) | Generate a report of 'Guest' users in Azure Active Directory (AAD). | Az Automation
+
