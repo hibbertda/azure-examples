@@ -8,9 +8,35 @@ The easiest way to get started using these examples is to used the [Azure Cloud 
 
 ##### Note: If this is your first time using the Azure Cloud Shell there are some initial setup steps
 
+## Prerequisite
+
+### Resource Groups
+
+The example deployments are intentded to be placed into Resource Groups based on the role and use of the resources. 
+
+![Resource Groups](/img/prereq_resourcegroups.png)
+
+The Resource Groups are required to be created before the template deployment is started. The Resource Group name is a required parameter for the deployment of an Azure template. 
+
+#### Create Resource Groups
+
+**Azure PowerShell**
+
+```powershell
+New-AzResourceGroup -Name <Resource Group Name>`
+    -location <Azure Region Name>
+```
+
+**Azure CLI (BASH**)
+
+```bash
+az group create --name <Resource Group Name> \
+    --location <Azure Region Name>
+```
+
 ### Clone Repo
 
-Clone this 'azure-examples' repository
+Clone this 'azure-examples' repository to your Azure Cloud Shell storage. 
 
 ```bash
 git clone https://github.com/hibbertda/azure-examples
