@@ -4,6 +4,12 @@
     "parameters": {
         "laWorkspaceName": {
             "value": ""
+        },
+        "laWorkspaceRetentionDays": {
+            "value": ""
+        },
+        "laWorkspaceSKU": {
+            "value": ""
         }
     }
 }
