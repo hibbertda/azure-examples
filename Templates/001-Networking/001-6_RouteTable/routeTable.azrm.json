@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+        {
+            "name": "routeTable1",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {
+                "routes": [
+                    {
+                        "name": "Block Internet Access",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "None"
+                        }
+                    }
+                ],
+                "disableBgpRoutePropagation": true
+            }
+        }
+    ],
+    "outputs": {},
+    "functions": []
+}
