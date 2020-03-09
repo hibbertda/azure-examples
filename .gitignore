@@ -1,3 +1,7 @@
 scratch.txt
+<<<<<<< HEAD
 sensitive*
+=======
+sensitive.*
+>>>>>>> be55d388d3ff92fade81aa2b03dcf73ff48d3c48
 #*.azrm.parameters.json
