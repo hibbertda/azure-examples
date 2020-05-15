@@ -13,3 +13,20 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: 'az group create --name $(az_rg-network) --location $(az_rg-location)'
+
+- task: AzureKeyVault@1
+  displayName: 'Get vpnShareSecret'
+  inputs:
+    azureSubscription: 'hbl-ms-airs-52020'
+    KeyVaultName: 'hbl-core-kv'
+
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'hbl-ms-airs-52020'
+    action: 'Create Or Update Resource Group'
+    templateLocation: 'Linked artifact'
+    csmFile: $(System.DefaultWorkingDirectory)/_hibbertda_azure-examples/Templates/001-Networking/001-1_networkHub-Net/networkHub-net.azrm.json
+    csmParametersFile: $(System.DefaultWorkingDirectory)/_hibbertda_azure-examples/Templates/001-Networking/001-1_networkHub-Net/networkHub-net.azrm.parameters.json
+    overrideParameters: '-coreVnetPrefix 11.11.0.0/24'
+    deploymentMode: 'Incremental'
