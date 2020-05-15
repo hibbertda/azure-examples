@@ -14,12 +14,6 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: 'az group create --name $(az_rg-network) --location $(az_rg-location)'
 
-- task: AzureKeyVault@1
-  displayName: 'Get vpnShareSecret'
-  inputs:
-    azureSubscription: 'hbl-ms-airs-52020'
-    KeyVaultName: 'hbl-core-kv'
-
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
     deploymentScope: 'Resource Group'
