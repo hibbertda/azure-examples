@@ -46,7 +46,9 @@
             "defaultValue": "[utcNow()]"
         }
     },
-    "variables": {},
+    "variables": {
+        "coreVnetName": "[concat('vnet-', parameters('coreVnetName'),'-', resourceGroup().location)]"
+    },
     "resources": [     
         {
             "name": "[concat('NSG-', parameters('coreVnetSubnets')[copyIndex('NSGCopy')].name)]",
