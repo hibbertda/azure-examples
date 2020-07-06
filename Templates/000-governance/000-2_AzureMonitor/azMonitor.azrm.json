@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "laWorkspaceName": {
@@ -13,43 +13,39 @@
            "metadata": {
                 "description": "Log retention in days"
             },
-            "defaultValue": 15
+            "defaultValue": 90
         },
         "laWorkspaceSKU": {
            "type": "string",
            "metadata": {
                 "description": "The name of the Workspace SKU"
             },
-            "allowedValues": [
-                "Free",
-                "Standard",
-                "Premium",
-                "PerNode",
-                "PerGB2018",
-                "Standalone"
-            ],
-            "defaultValue": "Free"
+            "defaultValue": "standard"
         }
     },
-    "variables": {},
+    "variables": {
+        "laWorkspaceName": "[concat('la-', parameters('laWorkspaceName'),'-', resourceGroup().location)]"
+    },
     "resources": [
         {
-            "name": "[parameters('laWorkspaceName')]",
+            "name": "[variables('laWorkspaceName')]",
             "type": "Microsoft.OperationalInsights/workspaces",
-            "apiVersion": "2015-11-01-preview",
+            "apiVersion": "2020-03-01-preview",
             "location": "[resourceGroup().location]",
             "comments": "Log Analytics Workspace",
             "properties": {
                 "sku": {
                     "name": "[parameters('laWorkspaceSKU')]"
                 },
-                "features": {
-                    "searchVersion": 1
-                },
-                "retentionInDays": "[parameters('laWorkspaceRetentionDays')]"
+                "retentionInDays": 90
             }
         }
     ],
-    "outputs": {},
+    "outputs": {
+        "output_kvName": {
+            "type": "string",
+            "value": "[variables('laWorkspaceName')]"
+        }
+    },
     "functions": []
 }
