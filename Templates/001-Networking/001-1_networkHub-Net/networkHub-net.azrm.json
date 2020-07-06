@@ -51,7 +51,7 @@
     },
     "resources": [     
         {
-            "name": "[concat('NSG-', parameters('coreVnetSubnets')[copyIndex('NSGCopy')].name)]",
+            "name": "[concat('nsg-', variables('coreVnetName'), '-',parameters('coreVnetSubnets')[copyIndex('NSGCopy')].name)]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2018-08-01",
             "location": "[resourceGroup().location]",
@@ -82,13 +82,13 @@
             }
         },
         {
-            "name": "[parameters('coreVnetName')]",
+            "name": "[variables('coreVnetName')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2018-08-01",
             "location": "[resourceGroup().location]",
             "dependsOn": ["NSGCopy"],
             "tags": {
-                "displayName": "[parameters('coreVnetName')]",
+                "displayName": "[variables('coreVnetName')]",
                 "creationTime": "[parameters('utcCreationTime')]"
             },
             "properties": {
@@ -102,11 +102,11 @@
                         "name": "subnets",
                         "count": "[length(parameters('coreVnetSubnets'))]",
                         "input": {
-                            "name": "[parameters('coreVnetSubnets')[copyIndex('subnets')].name]",
+                            "name": "[concat('sn-', variables('coreVnetName'),'-',parameters('coreVnetSubnets')[copyIndex('subnets')].name)]",
                             "properties": {
                                 "addressPrefix": "[parameters('coreVnetSubnets')[copyIndex('subnets')].addressPrefix]",
                                 "networkSecurityGroup": {
-                                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat('NSG-', parameters('coreVnetSubnets')[copyIndex('subnets')].name))]"
+                                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat('nsg-', variables('coreVnetName'), '-',parameters('coreVnetSubnets')[copyIndex('subnets')].name))]"
                                 }
                             }
                         }
@@ -117,10 +117,10 @@
         {
             "apiVersion": "2019-04-01",
             "type": "Microsoft.Network/virtualNetworks/subnets",
-            "name": "[concat(parameters('coreVnetName'), '/', 'GatewaySubnet')]",
+            "name": "[concat(variables('coreVnetName'), '/', 'GatewaySubnet')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('coreVnetName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('coreVnetName'))]"
             ],
             "properties": {
                 "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
