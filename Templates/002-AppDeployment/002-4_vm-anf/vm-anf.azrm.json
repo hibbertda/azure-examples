@@ -1,0 +1,177 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "type": "string",
+            "metadata": {
+                "description": "Application name"
+            },
+            "defaultValue": "anf"
+        },
+        "env": {
+            "type": "string",
+            "metadata": {
+                "description": "deployment environment"
+            },
+            "defaultValue": "demo"
+        },
+        "networking": {
+            "type": "object",
+            "metadata": {
+                "description": "target network information"
+            },
+            "defaultValue": {
+                "vnetResourceGroup": "hbl-demo-env",
+                "vnetName": "vnet-hbldemo-centralus",
+                "subnetName":"sn-vnet-hbldemo-centralus-demo-vm"
+            }
+        },
+        "compute": {
+            "type": "object",
+            "metadata": {
+                "description": "VM configuration"
+            },
+            "defaultValue": {
+                "instanceCount": "",
+                "vmSku": "Standard_E64s_v3",
+                "osDiskType": "Standard_LRS",
+                "osImagePublisher": "Canonical",
+                "osImageOffer": "UbuntuServer",
+                "osImageSku": "16.04-LTS"
+            }
+        },
+        "vmAdminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "username for vm admin account"
+            }
+        },
+        "vmAdminPassword": {
+            "type": "string",
+            "metadata": {
+                "description": "password for vm admin account"
+            }
+        }
+    },
+    "variables": {
+        "vnetID": "[resourceId(parameters('networking').vnetResourceGroup, 'Microsoft.Network/virtualNetworks/', parameters('networking').vnetName)]",
+        "subnetID": "[concat(variables('vnetID'), '/subnets/', parameters('networking').subnetName)]",
+        "vmHostname": "[concat('vm-hbl-', parameters('appName'), '-',parameters('compute').osImageOffer ,'-',parameters('env'))]",
+        "avSetName": "[concat('as-hbl-', parameters('appName'), '-', parameters('env'))]",
+        "installscripts": [
+            {
+                "name": "install-diskPerfTools",
+                "uri": ""
+            }
+        ]
+    },
+    "resources": [
+        {
+            "name": "[variables('avSetName')]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[variables('avSetName')]"
+            },
+            "properties": {
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 2
+            }
+        },
+        {
+            "name": "[concat('nic-', variables('vmHostname'), '-nic0')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[concat('nic-', variables('vmHostname'), '-nic0')]"
+            },
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "[concat('nic-', variables('vmHostname'), '-nic0-config')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetID')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(variables('vmHostname'), '-001')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-', variables('vmHostname'), '-nic0'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', variables('avSetName'))]"
+            ],
+            "tags": {
+                "displayName": "[concat(variables('vmHostname'), '-001')]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('compute').vmSku]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(variables('vmHostname'), '-001')]",
+                    "adminUsername": "[parameters('vmAdminUsername')]",
+                    "adminPassword": "[parameters('vmAdminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('compute').osImagePublisher]",
+                        "offer": "[parameters('compute').osImageOffer]",
+                        "sku": "[parameters('compute').osImageSku]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[concat(variables('vmHostname'), '-001-osdisk')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-', variables('vmHostname'), '-nic0'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "ubuntuVM1/customScript1",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "customScript1 for Linux VM"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', 'ubuntuVM1')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[concat('artifactsLocation', '/scripts/customScript.sh', 'artifactsLocationSasToken')]"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "sh customScript.sh"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
